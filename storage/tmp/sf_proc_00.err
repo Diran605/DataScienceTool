@@ -1,0 +1,119 @@
+[Fri Sep  4 12:51:39 2026] PHP 8.4.25 Development Server (http://0.0.0.0:8080) started
+[Fri Sep  4 12:59:05 2026] 127.0.0.1:62844 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:62844 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:52790 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56725 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:52790 [200]: GET /build/assets/app-I4MOTcII.css
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:52790 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56725 [200]: GET /build/assets/app-Db3638BV.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56725 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64570 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56054 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64570 [200]: GET /build/assets/Create-lqrxRJVc.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:57253 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56054 [200]: GET /build/assets/AuthenticatedLayout-F_loPgvQ.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:58759 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:57253 [200]: GET /build/assets/ApplicationLogo-DppqmXmZ.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:51256 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:58759 [200]: GET /build/assets/_plugin-vue_export-helper-BDNMzG2s.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64570 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64578 Accepted
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:51256 [200]: GET /build/assets/PrimaryButton-DiuM9eje.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:56054 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:57253 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:58759 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:51256 Closing
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64578 [200]: GET /build/assets/InputError-DNhe1UjY.js
+[Fri Sep  4 12:59:06 2026] 127.0.0.1:64578 Closing
+[Fri Sep  4 12:59:07 2026] 127.0.0.1:58430 Accepted
+[Fri Sep  4 12:59:07 2026] 127.0.0.1:58430 [200]: GET /build/assets/InputLabel-BctAg1f6.js
+[Fri Sep  4 12:59:07 2026] 127.0.0.1:58430 Closing
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62421 Accepted
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:63651 Accepted
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62436 Accepted
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:60844 Accepted
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62421 [200]: GET /favicon.ico
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:63651 [200]: GET /build/assets/Edit-CwniOuPk.js
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62436 [200]: GET /build/assets/Index-BSqjqo0C.js
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:60844 [200]: GET /build/assets/ConfirmPassword-BGjcPS2p.js
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62421 Closing
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:63651 Closing
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:62436 Closing
+[Fri Sep  4 12:59:09 2026] 127.0.0.1:60844 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:64421 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:64421 [200]: GET /build/assets/GuestLayout-C4zMIym-.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:64421 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:56337 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58597 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:63651 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:56337 [200]: GET /build/assets/TextInput-CdqsgfVU.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58597 [200]: GET /build/assets/ForgotPassword-n0BrTTaz.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:63651 [200]: GET /build/assets/Login-B_gWt5FD.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:56337 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58597 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:63651 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60867 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60867 [200]: GET /build/assets/Register-BN0fBsFV.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60867 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:62133 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:61057 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:53388 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:62133 [200]: GET /build/assets/ResetPassword-B8fXS0IE.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:61057 [200]: GET /build/assets/VerifyEmail-CLCMx9y3.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:53388 [200]: GET /build/assets/Create-DtfMaN1z.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:62133 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:61057 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:53388 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60844 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60844 [200]: GET /build/assets/Edit-3GsSs81t.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60844 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:55918 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58618 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:50308 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:55918 [200]: GET /build/assets/Index-CuHIeNQI.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58618 [200]: GET /build/assets/Dashboard-cZek5pBt.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:50308 [200]: GET /build/assets/Index-p624S4ay.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:55918 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:58618 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:50308 Closing
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60397 Accepted
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60397 [200]: GET /build/assets/Show-aTHDHhl7.js
+[Fri Sep  4 12:59:10 2026] 127.0.0.1:60397 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61880 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:60139 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51105 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61880 [200]: GET /build/assets/Edit-BIutknVg.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:60139 [200]: GET /build/assets/DeleteUserForm-BqNc0mU8.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51105 [200]: GET /build/assets/UpdatePasswordForm-Dl1dC6Jo.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61880 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:60139 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51105 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:56214 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:56214 [200]: GET /build/assets/UpdateProfileInformationForm-BELiS8nC.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:56214 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61518 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:62074 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:63000 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61518 [200]: GET /build/assets/Clean-CfIXRxY4.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:62074 [200]: GET /build/assets/Export-DuIJJoKo.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:63000 [200]: GET /build/assets/Index-WCiQfH0b.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:61518 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:62074 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:63000 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51144 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51144 [200]: GET /build/assets/Show-DjvhDNil.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:51144 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:55379 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:50256 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:49624 Accepted
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:55379 [200]: GET /build/assets/Validate-Ca4yEa8s.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:55379 Closing
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:50256 [200]: GET /build/assets/Welcome-C0UL_1B9.js
+[Fri Sep  4 12:59:11 2026] 127.0.0.1:50256 Closing
+[Fri Sep  4 12:59:16 2026] 127.0.0.1:49624 Closing
+[Fri Sep  4 12:59:23 2026] 127.0.0.1:62471 Accepted
+[Fri Sep  4 12:59:23 2026] PHP Warning:  PHP Request Startup: File upload error - unable to create a temporary file in Unknown on line 0
+[Fri Sep  4 12:59:23 2026] 127.0.0.1:62471 Closing
+[Fri Sep  4 12:59:24 2026] 127.0.0.1:51574 Accepted
+[Fri Sep  4 12:59:24 2026] 127.0.0.1:51574 Closing
+[Fri Sep  4 12:59:24 2026] 127.0.0.1:49573 Accepted

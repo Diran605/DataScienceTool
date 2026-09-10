@@ -1,0 +1,106 @@
+services:
+  # Laravel Application
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - storage-data:/var/www/html/storage/app/data-processing
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=datasciencetool
+      - DB_USERNAME=sail
+      - DB_PASSWORD=password
+      - CACHE_STORE=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - PYTHON_SERVICE_URL=http://python:8000
+      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+    networks:
+      - datasciencetool
+
+  # Queue Worker
+  queue:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - .:/var/www/html
+      - storage-data:/var/www/html/storage/app/data-processing
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=datasciencetool
+      - DB_USERNAME=sail
+      - DB_PASSWORD=password
+      - CACHE_STORE=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - PYTHON_SERVICE_URL=http://python:8000
+      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+    networks:
+      - datasciencetool
+
+  # Python FastAPI Service
+  python:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - storage-data:/shared-storage
+    environment:
+      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+      - STORAGE_PATH=/shared-storage
+    networks:
+      - datasciencetool
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=datasciencetool
+      - MYSQL_USER=sail
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - datasciencetool
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - datasciencetool
+
+volumes:
+  mysql-data:
+  redis-data:
+  storage-data:
+
+networks:
+  datasciencetool:
+    driver: bridge
