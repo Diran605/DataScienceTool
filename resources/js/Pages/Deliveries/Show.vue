@@ -21,11 +21,11 @@ defineProps({
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Delivery Information</h3>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
                         <div><strong>Run ID:</strong> {{ delivery?.run_id }}</div>
-                        <div><strong>Format:</strong> {{ delivery?.format }}</div>
-                        <div><strong>Contract Team:</strong> {{ delivery?.contract?.dev_team_name }}</div>
-                        <div><strong>Delivered By:</strong> {{ delivery?.user?.name }}</div>
-                        <div><strong>Date:</strong> {{ delivery?.created_at ? new Date(delivery.created_at).toLocaleString() : '' }}</div>
-                        <div><strong>File Path:</strong> {{ delivery?.file_path }}</div>
+                        <div><strong>Format:</strong> <span class="uppercase">{{ delivery?.output_path?.split('.').pop() || 'Unknown' }}</span></div>
+                        <div><strong>Contract Team:</strong> {{ delivery?.contract?.dev_team_name || 'No Contract (Export as is)' }}</div>
+                        <div><strong>Delivered By:</strong> {{ delivery?.delivered_by?.name || 'System' }}</div>
+                        <div><strong>Date:</strong> {{ delivery?.delivered_at ? new Date(delivery.delivered_at).toLocaleString() : '' }}</div>
+                        <div><strong>File Path:</strong> {{ delivery?.output_path }}</div>
                     </div>
 
                     <div class="mt-8">

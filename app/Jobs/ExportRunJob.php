@@ -23,7 +23,7 @@ class ExportRunJob implements ShouldQueue
 
     public function __construct(
         public Run $run,
-        public SchemaContract $contract,
+        public ?SchemaContract $contract,
         public string $format,
     ) {}
 
@@ -38,17 +38,19 @@ class ExportRunJob implements ShouldQueue
             'run_id' => $this->run->id,
             'step_type' => StepType::Export,
             'config' => [
-                'schema_contract_id' => $this->contract->id,
+                'schema_contract_id' => $this->contract?->id,
                 'format' => $this->format,
             ],
             'status' => 'running',
         ]);
 
         try {
+            $filePathToExport = $this->run->cleaned_file_path ?? $this->run->source_file_path;
+            
             $result = $pythonService->export(
-                $this->run->source_file_path,
+                $filePathToExport,
                 $this->format,
-                $this->contract->schema_definition
+                $this->contract?->schema_definition ?? []
             );
 
             $step->update([
@@ -59,8 +61,8 @@ class ExportRunJob implements ShouldQueue
             // Create the delivery record
             Delivery::create([
                 'run_id' => $this->run->id,
-                'schema_contract_id' => $this->contract->id,
-                'output_path' => $result['output_path'] ?? $result['file_path'] ?? '',
+                'schema_contract_id' => $this->contract?->id,
+                'output_path' => $result['export_url'] ?? '',
                 'delivered_by' => $this->run->created_by,
                 'delivered_at' => now(),
             ]);

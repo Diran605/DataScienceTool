@@ -25,6 +25,7 @@ class CleanRunJob implements ShouldQueue
     public function __construct(
         public Run $run,
         public array $steps,
+        public array $options = [],
     ) {}
 
     /**
@@ -37,20 +38,27 @@ class CleanRunJob implements ShouldQueue
         $step = RunStep::create([
             'run_id' => $this->run->id,
             'step_type' => StepType::Clean,
-            'config' => ['steps' => $this->steps],
+            'config' => ['steps' => $this->steps, 'options' => $this->options],
             'status' => 'running',
         ]);
 
         try {
-            $result = $pythonService->clean($this->run->source_file_path, $this->steps);
+            $result = $pythonService->clean($this->run->source_file_path, $this->steps, $this->options);
 
             $step->update([
                 'result' => $result,
                 'status' => 'completed',
             ]);
 
-            // Return to profiled so user can re-clean or proceed to validation
-            $this->run->update(['status' => RunStatus::Profiled]);
+            // Update the Run with the newly generated cleaned file path
+            if (isset($result['cleaned_file_path']) && !empty($result['cleaned_file_path'])) {
+                $this->run->update([
+                    'source_file_path' => $result['cleaned_file_path']
+                ]);
+            }
+
+            // Immediately reprofile the newly cleaned dataset so the user can see the comparison
+            \App\Jobs\ProfileRunJob::dispatch($this->run);
         } catch (Throwable $e) {
             $step->update([
                 'result' => ['error' => $e->getMessage()],

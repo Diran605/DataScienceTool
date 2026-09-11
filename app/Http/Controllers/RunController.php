@@ -86,6 +86,19 @@ class RunController extends Controller
     }
 
     /**
+     * Reprofile the run.
+     */
+    public function reprofile(Run $run): RedirectResponse
+    {
+        \Illuminate\Support\Facades\Gate::authorize('view', $run);
+
+        ProfileRunJob::dispatch($run);
+
+        return redirect()->route('runs.show', $run)
+            ->with('success', 'Reprofiling has started.');
+    }
+
+    /**
      * Remove the specified run.
      */
     public function destroy(Run $run): RedirectResponse

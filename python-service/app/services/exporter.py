@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import uuid
 from app.config import settings
@@ -22,7 +23,8 @@ class ExporterService:
             raise ValueError(f"Unsupported file format for export.")
             
         file_dir = os.path.dirname(file_path)
-        new_filename = f"exported_{uuid.uuid4().hex[:8]}.{target_format}"
+        base_filename = f"exported_{uuid.uuid4().hex[:8]}"
+        new_filename = f"{base_filename}.{target_format}"
         exported_rel_path = os.path.join(file_dir, new_filename).replace('\\', '/')
         exported_full_path = os.path.join(settings.storage_path, exported_rel_path)
         
@@ -43,8 +45,33 @@ class ExporterService:
             
         size_bytes = os.path.getsize(exported_full_path)
         
+        # Generate Data Dictionary
+        dict_filename = f"{base_filename}_dictionary.json"
+        dict_rel_path = os.path.join(file_dir, dict_filename).replace('\\', '/')
+        dict_full_path = os.path.join(settings.storage_path, dict_rel_path)
+        
+        data_dict = {
+            "dataset_info": {
+                "rows": len(df),
+                "columns": len(df.columns)
+            },
+            "columns": []
+        }
+        
+        for col in df.columns:
+            data_dict["columns"].append({
+                "name": col,
+                "type": str(df[col].dtype),
+                "null_count": int(df[col].isna().sum()),
+                "unique_count": int(df[col].nunique())
+            })
+            
+        with open(dict_full_path, 'w') as f:
+            json.dump(data_dict, f, indent=2)
+        
         return ExportResponse(
             status="success",
             export_url=exported_rel_path,
-            file_size_bytes=size_bytes
+            file_size_bytes=size_bytes,
+            data_dictionary_url=dict_rel_path
         )

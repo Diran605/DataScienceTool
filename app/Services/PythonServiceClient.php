@@ -31,13 +31,14 @@ class PythonServiceClient
      * Profile a file and return the quality report.
      *
      * @param  string  $filePath  Relative path within the data-processing disk
+     * @param  array  $options  Optional profiling options
      * @return array<string, mixed>
      */
-    public function profile(string $filePath): array
+    public function profile(string $filePath, array $options = []): array
     {
-        return $this->postAndDecode('/profile', [
+        return $this->postAndDecode('/profile', array_merge([
             'file_path' => $filePath,
-        ]);
+        ], $options));
     }
 
     /**
@@ -58,14 +59,15 @@ class PythonServiceClient
      *
      * @param  string  $filePath  Relative path within the data-processing disk
      * @param  array<int, array<string, mixed>>  $steps  Ordered cleaning step configs
+     * @param  array  $options  Optional cleaning options
      * @return array<string, mixed>
      */
-    public function clean(string $filePath, array $steps): array
+    public function clean(string $filePath, array $steps, array $options = []): array
     {
-        return $this->postAndDecode('/clean', [
+        return $this->postAndDecode('/clean', array_merge([
             'file_path' => $filePath,
             'steps' => $steps,
-        ]);
+        ], $options));
     }
 
     /**
@@ -88,15 +90,15 @@ class PythonServiceClient
      *
      * @param  string  $filePath  Relative path within the data-processing disk
      * @param  string  $format  Target format (csv, parquet, json)
-     * @param  array<string, mixed>|null  $schemaDefinition  Optional contract schema for JSON export
+     * @param  array<string, mixed>|null  $schema  Optional contract schema for JSON export
      * @return array<string, mixed>
      */
-    public function export(string $filePath, string $format, ?array $schemaDefinition = null): array
+    public function export(string $filePath, string $format, ?array $schema = null): array
     {
         return $this->postAndDecode('/export', array_filter([
             'file_path' => $filePath,
-            'target_format' => $format,
-            'schema_definition' => $schemaDefinition,
+            'format' => $format,
+            'options' => $schema,
         ]));
     }
 

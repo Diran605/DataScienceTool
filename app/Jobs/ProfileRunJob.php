@@ -43,7 +43,8 @@ class ProfileRunJob implements ShouldQueue
         ]);
 
         try {
-            $report = $pythonService->profile($this->run->source_file_path);
+            $filePathToProfile = $this->run->cleaned_file_path ?? $this->run->source_file_path;
+            $report = $pythonService->profile($filePathToProfile);
 
             $step->update([
                 'result' => $report,

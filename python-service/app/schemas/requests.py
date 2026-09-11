@@ -11,7 +11,8 @@ class ExtractRequest(BaseModel):
 
 class CleanRequest(BaseModel):
     file_path: str
-    operations: List[Dict[str, Any]]
+    steps: List[Dict[str, Any]]
+    options: Optional[Dict[str, Any]] = None
 
 class ValidateRequest(BaseModel):
     file_path: str

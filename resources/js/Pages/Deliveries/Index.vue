@@ -32,10 +32,10 @@ defineProps({
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr v-for="delivery in deliveries?.data" :key="delivery.id">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ delivery.run_id }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ delivery.contract?.dev_team_name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ delivery.format }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ delivery.user?.name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new Date(delivery.created_at).toLocaleDateString() }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ delivery.contract?.dev_team_name || 'No Contract' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 uppercase">{{ delivery.output_path?.split('.').pop() || 'Unknown' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ delivery.delivered_by?.name || 'System' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new Date(delivery.delivered_at || delivery.created_at).toLocaleDateString() }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <Link :href="route('deliveries.show', delivery.id)" class="text-indigo-600 hover:text-indigo-900 mr-4">View</Link>
                                     <a :href="route('deliveries.download', delivery.id)" class="text-green-600 hover:text-green-900">Download</a>

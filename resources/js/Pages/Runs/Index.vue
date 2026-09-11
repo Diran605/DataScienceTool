@@ -43,58 +43,87 @@ const statusColors = {
                         No runs yet. Upload a file to get started.
                     </div>
 
-                    <table v-else class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">File</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Steps</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Created By</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            <tr v-for="run in runs.data" :key="run.id">
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                    #{{ run.id }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ run.source_file_path.split('/').pop() }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 uppercase">
-                                    {{ run.source_file_type }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                    <span
-                                        class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
-                                        :class="statusColors[run.status] || 'bg-gray-100 text-gray-700'"
-                                    >
-                                        {{ run.status }}
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                    {{ run.steps_count }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                    {{ run.creator?.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                    {{ new Date(run.created_at).toLocaleDateString() }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
-                                    <Link
-                                        :href="route('runs.show', run.id)"
-                                        class="text-indigo-600 hover:text-indigo-900"
-                                    >
-                                        View
-                                    </Link>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div v-else>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">File</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Steps</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Created By</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <tr v-for="run in runs.data" :key="run.id" class="hover:bg-gray-50">
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                        #{{ run.id }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                        {{ run.source_file_path.split(/[\\/]/).pop() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 uppercase">
+                                        {{ run.source_file_type }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm">
+                                        <span
+                                            class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold leading-5 capitalize"
+                                            :class="statusColors[run.status] || 'bg-gray-100 text-gray-700'"
+                                        >
+                                            {{ run.status }}
+                                        </span>
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                        {{ run.steps_count }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                        {{ run.creator?.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                        {{ new Date(run.created_at).toLocaleDateString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                                        <Link
+                                            :href="route('runs.show', run.id)"
+                                            class="text-indigo-600 hover:text-indigo-900 font-medium"
+                                        >
+                                            View
+                                        </Link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <!-- Pagination -->
+                        <div v-if="runs.links && runs.links.length > 3" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">{{ runs.from }}</span> to <span class="font-medium">{{ runs.to }}</span> of <span class="font-medium">{{ runs.total }}</span> results
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <template v-for="(link, i) in runs.links" :key="i">
+                                            <div v-if="link.url === null" 
+                                                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-not-allowed" 
+                                                 v-html="link.label">
+                                            </div>
+                                            <Link v-else 
+                                                  :href="link.url" 
+                                                  class="relative inline-flex items-center px-4 py-2 border text-sm font-medium focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                  :class="link.active ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+                                                  v-html="link.label">
+                                            </Link>
+                                        </template>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

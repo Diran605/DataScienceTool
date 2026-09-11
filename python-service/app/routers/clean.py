@@ -9,6 +9,6 @@ router = APIRouter(prefix="/clean", tags=["clean"])
 async def clean_data(request: CleanRequest):
     try:
         service = CleanerService()
-        return service.clean(request.file_path, request.operations)
+        return service.clean(request.file_path, request.steps, request.options)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

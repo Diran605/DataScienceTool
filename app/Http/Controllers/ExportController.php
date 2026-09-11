@@ -24,6 +24,7 @@ class ExportController extends Controller
 
         return Inertia::render('Runs/Export', [
             'run' => $run,
+            'contracts' => SchemaContract::all(),
         ]);
     }
 
@@ -35,17 +36,20 @@ class ExportController extends Controller
         Gate::authorize('view', $run);
 
         abort_unless(
-            in_array($run->status, [\App\Enums\RunStatus::Profiled]),
+            in_array($run->status->value, ['profiled', 'cleaned', 'validated', 'exporting', 'delivered', 'failed']),
             422,
             'Run must be validated before export.'
         );
 
         $validated = $request->validate([
-            'schema_contract_id' => ['required', 'exists:schema_contracts,id'],
+            'schema_contract_id' => ['nullable', 'exists:schema_contracts,id'],
             'format' => ['required', 'string', 'in:csv,json,parquet'],
         ]);
 
-        $contract = SchemaContract::findOrFail($validated['schema_contract_id']);
+        $contract = null;
+        if (!empty($validated['schema_contract_id'])) {
+            $contract = SchemaContract::findOrFail($validated['schema_contract_id']);
+        }
 
         ExportRunJob::dispatch($run, $contract, $validated['format']);
 

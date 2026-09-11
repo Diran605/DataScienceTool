@@ -17,9 +17,9 @@ Route::get('/', function () {
     return redirect()->to(auth()->check() ? '/runs' : '/login');
 });
 
-Route::get('/dashboard', function () {
-    return redirect()->to('/runs');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Runs
     Route::resource('runs', RunController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::post('runs/{run}/reprofile', [RunController::class, 'reprofile'])->name('runs.reprofile');
     Route::get('runs/{run}/steps/{step}', [RunStepController::class, 'show'])->name('run-steps.show');
 
     // Clean / Validate / Export actions on runs

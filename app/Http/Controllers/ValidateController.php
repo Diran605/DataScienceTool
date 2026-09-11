@@ -22,7 +22,7 @@ class ValidateController extends Controller
         Gate::authorize('view', $run);
 
         abort_unless(
-            in_array($run->status, [RunStatus::Profiled, RunStatus::Cleaning]),
+            in_array($run->status->value, ['profiled', 'cleaned', 'validating', 'exporting', 'delivered']),
             422,
             'Run must be profiled or cleaned before validation.'
         );
@@ -49,7 +49,7 @@ class ValidateController extends Controller
         Gate::authorize('view', $run);
 
         abort_unless(
-            in_array($run->status, [RunStatus::Profiled, RunStatus::Cleaning]),
+            in_array($run->status->value, ['profiled', 'cleaned', 'validating', 'exporting', 'delivered']),
             422,
             'Run must be profiled or cleaned before validation.'
         );

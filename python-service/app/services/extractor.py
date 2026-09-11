@@ -18,12 +18,22 @@ class ExtractorService:
         # Use pdfplumber to extract tables from all pages
         all_data = []
         headers = None
+        total_cells = 0
+        empty_cells = 0
         
         with pdfplumber.open(full_path) as pdf:
             for page in pdf.pages:
                 tables = page.extract_tables()
                 for table in tables:
                     if not table: continue
+                    
+                    # Compute confidence heuristic based on empty cells
+                    for row in table:
+                        for cell in row:
+                            total_cells += 1
+                            if not cell or str(cell).strip() == '':
+                                empty_cells += 1
+                                
                     # Rough heuristic: if headers not set, take first row
                     if not headers:
                         headers = table[0]
@@ -39,6 +49,14 @@ class ExtractorService:
             
         df = pd.DataFrame(all_data, columns=clean_headers)
         
+        # Calculate confidence score (0.0 to 1.0)
+        # Penalize if there are too many empty cells (suggests bad parsing)
+        confidence_score = 1.0
+        if total_cells > 0:
+            empty_ratio = empty_cells / total_cells
+            if empty_ratio > 0.5:
+                confidence_score = max(0.1, 1.0 - empty_ratio)
+        
         # Save extracted data as CSV for further processing
         file_dir = os.path.dirname(file_path)
         new_filename = f"extracted_{uuid.uuid4().hex[:8]}.csv"
@@ -50,5 +68,6 @@ class ExtractorService:
         return ExtractResponse(
             status="success",
             extracted_file_path=extracted_rel_path,
-            row_count=len(df)
+            row_count=len(df),
+            confidence_score=confidence_score
         )
