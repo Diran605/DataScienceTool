@@ -6,6 +6,7 @@ import ProfileViewer from '@/Components/ProfileViewer.vue';
 
 const props = defineProps({
     run: Object,
+    canProcess: Boolean,
 });
 
 let pollInterval = null;
@@ -51,7 +52,10 @@ const statusColors = {
     profiling: 'bg-blue-100 text-blue-700',
     profiled: 'bg-green-100 text-green-700',
     cleaning: 'bg-yellow-100 text-yellow-700',
+    cleaned: 'bg-green-100 text-green-700',
     validating: 'bg-purple-100 text-purple-700',
+    validated: 'bg-emerald-100 text-emerald-700',
+    validation_failed: 'bg-orange-100 text-orange-700',
     exporting: 'bg-indigo-100 text-indigo-700',
     delivered: 'bg-emerald-100 text-emerald-700',
     failed: 'bg-red-100 text-red-700',
@@ -175,7 +179,7 @@ const getCorrelatedPairs = (matrix) => {
                 </div>
 
                 <!-- Workflow Actions -->
-                <div v-if="['profiled', 'cleaning', 'validating', 'exporting', 'delivered', 'failed'].includes(run.status) && run.status !== 'pending' && run.status !== 'profiling'" class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <div v-if="canProcess && ['profiled', 'cleaned', 'validated', 'validation_failed', 'delivered', 'failed'].includes(run.status)" class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Actions</h3>
                         <div class="flex flex-wrap gap-3">
@@ -185,6 +189,10 @@ const getCorrelatedPairs = (matrix) => {
                             >
                                 Re-Profile
                             </button>
+                            <p v-if="run.status === 'failed'" class="self-center text-sm text-gray-500">
+                                The last step failed. Re-profile the run to continue.
+                            </p>
+                            <template v-else>
                             <Link
                                 :href="route('runs.clean', run.id)"
                                 class="inline-flex items-center rounded-md bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-700 ring-1 ring-yellow-200 hover:bg-yellow-100"
@@ -203,6 +211,7 @@ const getCorrelatedPairs = (matrix) => {
                             >
                                 Export
                             </Link>
+                            </template>
                         </div>
                     </div>
                 </div>

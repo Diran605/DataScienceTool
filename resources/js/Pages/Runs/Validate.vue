@@ -43,7 +43,7 @@ const latestValidation = validationSteps[validationSteps.length - 1];
                             <select v-model="form.schema_contract_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                 <option disabled value="">Please select one</option>
                                 <option v-for="c in contracts" :key="c.id" :value="c.id">
-                                    {{ c.dev_team_name }} - {{ c.target_table_name }} ({{ c.format }})
+                                    {{ c.dev_team_name }} ({{ c.format }})
                                 </option>
                             </select>
                             <InputError :message="form.errors.schema_contract_id" class="mt-2" />

@@ -25,6 +25,7 @@ class ExportRunJob implements ShouldQueue
         public Run $run,
         public ?SchemaContract $contract,
         public string $format,
+        public ?string $overrideReason = null,
     ) {}
 
     /**
@@ -34,19 +35,22 @@ class ExportRunJob implements ShouldQueue
     {
         $this->run->update(['status' => RunStatus::Exporting]);
 
+        $filePathToExport = $this->run->workingFilePath();
+
         $step = RunStep::create([
             'run_id' => $this->run->id,
             'step_type' => StepType::Export,
+            'input_file_path' => $filePathToExport,
             'config' => [
                 'schema_contract_id' => $this->contract?->id,
                 'format' => $this->format,
+                // Set when exporting data that has not passed validation (audit trail).
+                'override_reason' => $this->overrideReason,
             ],
             'status' => 'running',
         ]);
 
         try {
-            $filePathToExport = $this->run->cleaned_file_path ?? $this->run->source_file_path;
-            
             $result = $pythonService->export(
                 $filePathToExport,
                 $this->format,
@@ -54,6 +58,7 @@ class ExportRunJob implements ShouldQueue
             );
 
             $step->update([
+                'output_file_path' => $result['export_url'] ?? null,
                 'result' => $result,
                 'status' => 'completed',
             ]);

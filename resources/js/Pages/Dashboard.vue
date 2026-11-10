@@ -55,7 +55,7 @@ defineProps({
                         <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{{ stats.total_runs }}</dd>
                     </div>
                     <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                        <dt class="truncate text-sm font-medium text-gray-500">Profiled</dt>
+                        <dt class="truncate text-sm font-medium text-gray-500">In Progress</dt>
                         <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{{ stats.profiled }}</dd>
                     </div>
                     <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
@@ -99,10 +99,11 @@ defineProps({
                                             :class="{
                                                 'bg-green-100 text-green-800': run.status === 'delivered',
                                                 'bg-red-100 text-red-800': run.status === 'failed',
-                                                'bg-yellow-100 text-yellow-800': ['pending', 'processing'].includes(run.status),
-                                                'bg-blue-100 text-blue-800': run.status === 'profiled'
+                                                'bg-orange-100 text-orange-800': run.status === 'validation_failed',
+                                                'bg-yellow-100 text-yellow-800': ['pending', 'profiling', 'cleaning', 'validating', 'exporting'].includes(run.status),
+                                                'bg-blue-100 text-blue-800': ['profiled', 'cleaned', 'validated'].includes(run.status)
                                             }">
-                                            {{ run.status }}
+                                            {{ run.status.replace('_', ' ') }}
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

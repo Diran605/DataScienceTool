@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RunStatus;
 use App\Models\Delivery;
 use App\Models\Run;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $runsQuery = Run::query()
             ->when(! $user->hasRole('superadmin'), function ($query) use ($user) {
@@ -40,7 +42,9 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'stats' => [
                 'total_runs' => $totalRuns,
-                'profiled' => $runsByStatus['profiled'] ?? 0,
+                // Runs with data ready for review/cleaning/validation/export (not yet delivered).
+                'profiled' => collect([RunStatus::Profiled, RunStatus::Cleaned, RunStatus::Validated, RunStatus::ValidationFailed])
+                    ->sum(fn (RunStatus $status) => $runsByStatus[$status->value] ?? 0),
                 'delivered' => $totalDeliveries,
                 'failed' => $runsByStatus['failed'] ?? 0,
             ],

@@ -44,6 +44,16 @@ class RunPolicy
     }
 
     /**
+     * Determine whether the user can process the run (reprofile, clean, validate, export).
+     * Viewers can look at runs but never change their data.
+     */
+    public function process(User $user, Run $run): bool
+    {
+        return $user->hasPermissionTo('runs.create')
+            && $run->created_by === $user->id;
+    }
+
+    /**
      * Determine whether the user can delete the run.
      */
     public function delete(User $user, Run $run): bool

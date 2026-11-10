@@ -23,7 +23,6 @@ class ValidateRunJob implements ShouldQueue
     public function __construct(
         public Run $run,
         public SchemaContract $contract,
-        public ?string $overrideReason = null,
     ) {}
 
     /**
@@ -33,19 +32,21 @@ class ValidateRunJob implements ShouldQueue
     {
         $this->run->update(['status' => RunStatus::Validating]);
 
+        $filePathToValidate = $this->run->workingFilePath();
+
         $step = RunStep::create([
             'run_id' => $this->run->id,
             'step_type' => StepType::Validate,
+            'input_file_path' => $filePathToValidate,
             'config' => [
                 'schema_contract_id' => $this->contract->id,
-                'override_reason' => $this->overrideReason,
             ],
             'status' => 'running',
         ]);
 
         try {
             $result = $pythonService->validate(
-                $this->run->source_file_path,
+                $filePathToValidate,
                 $this->contract->schema_definition
             );
 
@@ -54,9 +55,9 @@ class ValidateRunJob implements ShouldQueue
                 'status' => 'completed',
             ]);
 
-            // Stay at validating status — user needs to review results
-            // and either proceed to export or fix issues
-            $this->run->update(['status' => RunStatus::Profiled]);
+            $this->run->update([
+                'status' => ($result['is_valid'] ?? false) ? RunStatus::Validated : RunStatus::ValidationFailed,
+            ]);
         } catch (Throwable $e) {
             $step->update([
                 'result' => ['error' => $e->getMessage()],

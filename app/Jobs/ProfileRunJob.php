@@ -36,14 +36,16 @@ class ProfileRunJob implements ShouldQueue
     {
         $this->run->update(['status' => RunStatus::Profiling]);
 
+        $filePathToProfile = $this->run->workingFilePath();
+
         $step = RunStep::create([
             'run_id' => $this->run->id,
             'step_type' => StepType::Profile,
+            'input_file_path' => $filePathToProfile,
             'status' => 'running',
         ]);
 
         try {
-            $filePathToProfile = $this->run->cleaned_file_path ?? $this->run->source_file_path;
             $report = $pythonService->profile($filePathToProfile);
 
             $step->update([
@@ -51,7 +53,9 @@ class ProfileRunJob implements ShouldQueue
                 'status' => 'completed',
             ]);
 
-            $this->run->update(['status' => RunStatus::Profiled]);
+            $this->run->update([
+                'status' => $this->run->current_file_path ? RunStatus::Cleaned : RunStatus::Profiled,
+            ]);
         } catch (Throwable $e) {
             $step->update([
                 'result' => ['error' => $e->getMessage()],
