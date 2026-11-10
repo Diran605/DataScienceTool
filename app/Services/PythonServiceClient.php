@@ -36,7 +36,7 @@ class PythonServiceClient
      */
     public function profile(string $filePath, array $options = []): array
     {
-        return $this->postAndDecode('/profile', array_merge([
+        return $this->postAndDecode('/profile', $this->withOptions([
             'file_path' => $filePath,
         ], $options));
     }
@@ -64,7 +64,7 @@ class PythonServiceClient
      */
     public function clean(string $filePath, array $steps, array $options = []): array
     {
-        return $this->postAndDecode('/clean', array_merge([
+        return $this->postAndDecode('/clean', $this->withOptions([
             'file_path' => $filePath,
             'steps' => $steps,
         ], $options));
@@ -100,6 +100,24 @@ class PythonServiceClient
             'format' => $format,
             'options' => $schema,
         ]));
+    }
+
+    /**
+     * Add options under the `options` key the Python service reads. Empty options
+     * are left out entirely: an empty PHP array encodes as a JSON list, which the
+     * service would reject as an invalid object.
+     *
+     * @param  array<string, mixed>  $payload
+     * @param  array<string, mixed>  $options
+     * @return array<string, mixed>
+     */
+    protected function withOptions(array $payload, array $options): array
+    {
+        if ($options !== []) {
+            $payload['options'] = $options;
+        }
+
+        return $payload;
     }
 
     /**

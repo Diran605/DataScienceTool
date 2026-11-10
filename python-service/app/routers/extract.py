@@ -10,7 +10,7 @@ router = APIRouter(prefix="/extract", tags=["extract"])
 async def extract_data(request: ExtractRequest):
     try:
         service = ExtractorService()
-        return service.extract(request.file_path, request.format)
+        return service.extract(request.file_path)
     except ClientError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

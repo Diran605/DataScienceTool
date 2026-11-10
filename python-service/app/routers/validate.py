@@ -10,7 +10,7 @@ router = APIRouter(prefix="/validate", tags=["validate"])
 async def validate_data(request: ValidateRequest):
     try:
         service = ValidatorService()
-        return service.validate(request.file_path, request.rules)
+        return service.validate(request.file_path, request.schema_definition)
     except ClientError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

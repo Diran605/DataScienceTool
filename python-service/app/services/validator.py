@@ -29,7 +29,8 @@ class ValidatorService:
         # 1. Check missing columns
         for expected_col in expected_columns:
             name = expected_col.get('name')
-            if name not in df_cols:
+            # Optional columns ("required": false) may be absent.
+            if name not in df_cols and expected_col.get('required', True):
                 errors.append({
                     "rule": "missing_column",
                     "column": name,
