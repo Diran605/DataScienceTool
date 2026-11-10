@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RunStatus;
 use App\Enums\StepType;
 use App\Jobs\CleanRunJob;
 use App\Models\Run;
@@ -50,7 +51,7 @@ class CleanController extends Controller
             'steps.*.action' => ['required', 'string'],
             'steps.*.columns' => ['sometimes', 'array', 'nullable'],
             'steps.*.strategy' => ['sometimes', 'string', 'nullable'],
-            'steps.*.value' => ['sometimes', 'nullable'],
+            'steps.*.value' => ['sometimes', 'nullable', 'max:500'],
             'steps.*.pattern' => ['sometimes', 'string', 'nullable'],
             'steps.*.mapping' => ['sometimes', 'array', 'nullable'],
             'options' => ['sometimes', 'array', 'nullable'],
@@ -76,6 +77,8 @@ class CleanController extends Controller
                 return redirect()->back()->with('error', 'Preview failed: '.$e->getMessage());
             }
         }
+
+        abort_unless($run->claim(RunStatus::settled(), RunStatus::Cleaning), 409, 'This run is already being processed.');
 
         CleanRunJob::dispatch($run, $validated['steps'], $validated['options'] ?? []);
 

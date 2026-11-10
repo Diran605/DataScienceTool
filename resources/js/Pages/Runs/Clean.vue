@@ -25,7 +25,7 @@ const availableActions = [
     { type: 'normalize_text', label: 'Normalize Text', desc: 'Convert text to lowercase and strip extra whitespace.' },
     { type: 'rename_columns', label: 'Rename Columns', desc: 'Rename columns for clarity using a mapping.' },
     { type: 'regex_extract', label: 'Regex / Text Extract', desc: 'Extract specific patterns (like emails or IDs) into new columns.' },
-    { type: 'custom_expression', label: 'Custom Expression', desc: 'Advanced math or logic using Python/Pandas (e.g., df["Total"] = df["Qty"] * 2).' },
+    { type: 'custom_expression', label: 'Filter Rows', desc: 'Keep only rows matching a condition (e.g., age >= 18 and country == "CM").' },
 ];
 
 const form = useForm({
@@ -49,12 +49,14 @@ const availableColumns = computed(() => {
 const addStep = () => {
     if (!selectedActionType.value) return;
     
+    const isFilter = selectedActionType.value === 'custom_expression';
+
     const step = {
         action: selectedActionType.value,
         columns: newActionConfig.value.columns ? newActionConfig.value.columns.split(',').map(s => s.trim()).filter(s => s) : [],
         strategy: newActionConfig.value.strategy || null,
-        value: newActionConfig.value.value || null,
-        custom_expression: newActionConfig.value.custom_expression || null,
+        // The Python service reads the filter condition from `value`.
+        value: (isFilter ? newActionConfig.value.custom_expression : newActionConfig.value.value) || null,
     };
     
     form.steps.push(step);
@@ -150,9 +152,12 @@ const submit = (preview = false) => {
                             </div>
 
                             <div v-if="selectedActionType === 'custom_expression'" class="col-span-2">
-                                <InputLabel for="custom_expression" value="Custom Pandas Expression" />
-                                <textarea id="custom_expression" v-model="newActionConfig.custom_expression" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono text-sm" placeholder="df['col'] = df['col'] * 2"></textarea>
-                                <p class="mt-1 text-xs text-gray-500">Use `df` as the dataframe variable.</p>
+                                <InputLabel for="custom_expression" value="Filter condition (rows that match are kept)" />
+                                <textarea id="custom_expression" v-model="newActionConfig.custom_expression" rows="3" maxlength="500" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono text-sm" placeholder="age >= 18 and country in ['CM', 'NG']"></textarea>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Use column names, values, comparisons (== != &lt; &gt; &lt;= &gt;=), arithmetic, <code>and</code> / <code>or</code> / <code>not</code> and <code>in [...]</code>.
+                                    Wrap names with spaces in backticks, e.g. <code>`unit price` &gt; 10</code>. Function calls are not allowed.
+                                </p>
                             </div>
                         </div>
 
@@ -189,8 +194,8 @@ const submit = (preview = false) => {
                                     <div v-if="step.columns && step.columns.length"><span class="font-medium text-gray-500">Columns:</span> {{ step.columns.join(', ') }}</div>
                                     <div v-else><span class="font-medium text-gray-500">Columns:</span> <span class="italic">All applicable</span></div>
                                     <div v-if="step.strategy"><span class="font-medium text-gray-500">Strategy:</span> {{ step.strategy }}</div>
-                                    <div v-if="step.value"><span class="font-medium text-gray-500">Value:</span> {{ step.value }}</div>
-                                    <div v-if="step.custom_expression" class="col-span-full"><span class="font-medium text-gray-500 block">Expression:</span> <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">{{ step.custom_expression }}</code></div>
+                                    <div v-if="step.action === 'custom_expression' && step.value" class="col-span-full"><span class="font-medium text-gray-500 block">Condition:</span> <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">{{ step.value }}</code></div>
+                                    <div v-else-if="step.value"><span class="font-medium text-gray-500">Value:</span> {{ step.value }}</div>
                                 </div>
                             </div>
                             <button @click="removeStep(index)" type="button" class="text-red-500 hover:text-red-700 bg-red-50 px-3 py-1 rounded text-sm font-medium border border-red-100 hover:bg-red-100 shrink-0">

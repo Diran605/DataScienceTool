@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RunStatus;
 use App\Jobs\ExportRunJob;
 use App\Models\Run;
 use App\Models\SchemaContract;
@@ -68,6 +69,8 @@ class ExportController extends Controller
                     : 'This data has not passed validation. Provide an override reason to export anyway.',
             ]);
         }
+
+        abort_unless($run->claim(RunStatus::settled(), RunStatus::Exporting), 409, 'This run is already being processed.');
 
         ExportRunJob::dispatch($run, $contract, $validated['format'], $overrideReason);
 

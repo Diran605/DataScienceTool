@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RunStatus;
 use App\Jobs\ValidateRunJob;
 use App\Models\Run;
 use App\Models\SchemaContract;
@@ -46,6 +47,8 @@ class ValidateController extends Controller
         $contract = SchemaContract::findOrFail($validated['schema_contract_id']);
 
         Gate::authorize('run', $contract);
+
+        abort_unless($run->claim(RunStatus::settled(), RunStatus::Validating), 409, 'This run is already being processed.');
 
         ValidateRunJob::dispatch($run, $contract);
 

@@ -62,6 +62,29 @@ class Run extends Model
     }
 
     /**
+     * Atomically move the run to $to, but only if it is currently in one of $from.
+     *
+     * This is a single conditional UPDATE, so when two requests race (e.g. a
+     * double-clicked button) exactly one of them wins and the other gets false.
+     *
+     * @param  array<int, RunStatus>  $from
+     */
+    public function claim(array $from, RunStatus $to): bool
+    {
+        $claimed = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('status', array_map(fn (RunStatus $status) => $status->value, $from))
+            ->update(['status' => $to, 'updated_at' => now()]) === 1;
+
+        if ($claimed) {
+            $this->status = $to;
+            $this->syncOriginalAttribute('status');
+        }
+
+        return $claimed;
+    }
+
+    /**
      * The most recent completed step of the given type. Ordered by id rather than
      * timestamp so steps created within the same second are still ordered correctly.
      */

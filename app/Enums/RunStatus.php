@@ -27,6 +27,16 @@ enum RunStatus: string
     }
 
     /**
+     * Statuses from which a run can be re-profiled: any settled status, or after a failure.
+     *
+     * @return array<int, self>
+     */
+    public static function reprofilable(): array
+    {
+        return [...self::settled(), self::Failed];
+    }
+
+    /**
      * Whether the run's data can be (re-)cleaned in this status.
      */
     public function canClean(): bool

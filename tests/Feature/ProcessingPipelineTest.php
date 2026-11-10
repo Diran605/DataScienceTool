@@ -120,6 +120,50 @@ test('cannot dispatch clean while another job is in flight', function () {
         ->assertStatus(422);
 });
 
+test('a double-submitted clean only dispatches one job', function () {
+    Queue::fake();
+
+    $user = userWithRole('operator');
+    $run = Run::factory()->profiled()->create(['created_by' => $user->id]);
+    $payload = ['steps' => [['action' => 'drop_nulls']]];
+
+    actingAs($user)->put(route('runs.clean.update', $run), $payload)->assertRedirect(route('runs.show', $run));
+
+    expect($run->fresh()->status)->toBe(RunStatus::Cleaning);
+
+    actingAs($user)->put(route('runs.clean.update', $run), $payload)->assertStatus(422);
+
+    Queue::assertPushed(CleanRunJob::class, 1);
+});
+
+test('claim only succeeds once when two requests race on the same stale model', function () {
+    $run = Run::factory()->profiled()->create();
+
+    // Both "requests" loaded the run while it was still profiled.
+    $firstRequestCopy = Run::find($run->id);
+    $secondRequestCopy = Run::find($run->id);
+
+    expect($firstRequestCopy->claim(RunStatus::settled(), RunStatus::Cleaning))->toBeTrue()
+        ->and($secondRequestCopy->claim(RunStatus::settled(), RunStatus::Validating))->toBeFalse()
+        ->and($run->fresh()->status)->toBe(RunStatus::Cleaning)
+        ->and($firstRequestCopy->status)->toBe(RunStatus::Cleaning);
+});
+
+test('filter values longer than 500 characters are rejected', function () {
+    Queue::fake();
+
+    $user = userWithRole('operator');
+    $run = Run::factory()->profiled()->create(['created_by' => $user->id]);
+
+    actingAs($user)
+        ->put(route('runs.clean.update', $run), [
+            'steps' => [['action' => 'custom_expression', 'value' => str_repeat('a', 501)]],
+        ])
+        ->assertSessionHasErrors('steps.0.value');
+
+    Queue::assertNothingPushed();
+});
+
 test('users can dispatch validate job', function () {
     $user = userWithRole('operator');
 

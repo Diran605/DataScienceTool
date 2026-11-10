@@ -98,10 +98,12 @@ class RunController extends Controller
         Gate::authorize('process', $run);
 
         abort_unless(
-            $run->status->canClean() || $run->status === RunStatus::Failed,
+            in_array($run->status, RunStatus::reprofilable(), true),
             422,
             'Run is still being processed.'
         );
+
+        abort_unless($run->claim(RunStatus::reprofilable(), RunStatus::Profiling), 409, 'This run is already being processed.');
 
         ProfileRunJob::dispatch($run);
 
