@@ -38,6 +38,9 @@ return [
     'python' => [
         'url' => env('PYTHON_SERVICE_URL', 'http://localhost:8000'),
         'key' => env('INTERNAL_KEY'),
+        // Seconds to wait for one response. Keep the queue's retry_after (config/queue.php)
+        // larger than this plus the job margin, or long jobs get run twice.
+        'timeout' => (int) env('PYTHON_SERVICE_TIMEOUT', 240),
     ],
 
 ];

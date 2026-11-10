@@ -8,22 +8,16 @@ use App\Models\Run;
 use App\Models\RunStep;
 use App\Models\SchemaContract;
 use App\Services\PythonServiceClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
 
-class ValidateRunJob implements ShouldQueue
+class ValidateRunJob extends RunStepJob
 {
-    use Queueable;
-
-    public int $tries = 2;
-
-    public int $timeout = 300;
-
     public function __construct(
-        public Run $run,
+        Run $run,
         public SchemaContract $contract,
-    ) {}
+    ) {
+        parent::__construct($run);
+    }
 
     /**
      * Execute the job — call Python /validate and store pass/fail.
@@ -59,14 +53,7 @@ class ValidateRunJob implements ShouldQueue
                 'status' => ($result['is_valid'] ?? false) ? RunStatus::Validated : RunStatus::ValidationFailed,
             ]);
         } catch (Throwable $e) {
-            $step->update([
-                'result' => ['error' => $e->getMessage()],
-                'status' => 'failed',
-            ]);
-
-            $this->run->update(['status' => RunStatus::Failed]);
-
-            throw $e;
+            $this->handleStepFailure($step, $e);
         }
     }
 }

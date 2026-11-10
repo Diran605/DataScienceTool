@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Run;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class StoreRunRequest extends FormRequest
 {
@@ -48,8 +49,8 @@ class StoreRunRequest extends FormRequest
     {
         $raw_files = $_FILES ?? [];
         $file_error = $raw_files['file']['error'] ?? 'missing';
-        
-        \Illuminate\Support\Facades\Log::info('Raw Upload Data:', [
+
+        Log::info('Raw Upload Data:', [
             'raw_files' => $raw_files,
             'file_error' => $file_error,
         ]);

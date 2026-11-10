@@ -9,24 +9,19 @@ use App\Models\Run;
 use App\Models\RunStep;
 use App\Models\SchemaContract;
 use App\Services\PythonServiceClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use App\Services\PythonServiceException;
 use Throwable;
 
-class ExportRunJob implements ShouldQueue
+class ExportRunJob extends RunStepJob
 {
-    use Queueable;
-
-    public int $tries = 2;
-
-    public int $timeout = 300;
-
     public function __construct(
-        public Run $run,
+        Run $run,
         public ?SchemaContract $contract,
         public string $format,
         public ?string $overrideReason = null,
-    ) {}
+    ) {
+        parent::__construct($run);
+    }
 
     /**
      * Execute the job — call Python /export and create delivery record.
@@ -57,31 +52,29 @@ class ExportRunJob implements ShouldQueue
                 $this->contract?->schema_definition ?? []
             );
 
+            $exportPath = $result['export_url'] ?? null;
+
+            if (empty($exportPath)) {
+                throw PythonServiceException::invalidResponse('/export', 'no export file path was returned.');
+            }
+
             $step->update([
-                'output_file_path' => $result['export_url'] ?? null,
+                'output_file_path' => $exportPath,
                 'result' => $result,
                 'status' => 'completed',
             ]);
 
-            // Create the delivery record
             Delivery::create([
                 'run_id' => $this->run->id,
                 'schema_contract_id' => $this->contract?->id,
-                'output_path' => $result['export_url'] ?? '',
+                'output_path' => $exportPath,
                 'delivered_by' => $this->run->created_by,
                 'delivered_at' => now(),
             ]);
 
             $this->run->update(['status' => RunStatus::Delivered]);
         } catch (Throwable $e) {
-            $step->update([
-                'result' => ['error' => $e->getMessage()],
-                'status' => 'failed',
-            ]);
-
-            $this->run->update(['status' => RunStatus::Failed]);
-
-            throw $e;
+            $this->handleStepFailure($step, $e);
         }
     }
 }

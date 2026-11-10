@@ -7,27 +7,22 @@ use App\Enums\StepType;
 use App\Models\Run;
 use App\Models\RunStep;
 use App\Services\PythonServiceClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
-use RuntimeException;
+use App\Services\PythonServiceException;
 use Throwable;
 
-class CleanRunJob implements ShouldQueue
+class CleanRunJob extends RunStepJob
 {
-    use Queueable;
-
-    public int $tries = 2;
-
-    public int $timeout = 300;
-
     /**
      * @param  array<int, array<string, mixed>>  $steps  Ordered cleaning step configs
+     * @param  array<string, mixed>  $options
      */
     public function __construct(
-        public Run $run,
+        Run $run,
         public array $steps,
         public array $options = [],
-    ) {}
+    ) {
+        parent::__construct($run);
+    }
 
     /**
      * Execute the job — call Python /clean and store the diff.
@@ -53,7 +48,7 @@ class CleanRunJob implements ShouldQueue
             $cleanedFilePath = $result['cleaned_file_path'] ?? null;
 
             if (empty($cleanedFilePath)) {
-                throw new RuntimeException('Python service did not return a cleaned file path.');
+                throw PythonServiceException::invalidResponse('/clean', 'no cleaned file path was returned.');
             }
 
             $step->update([
@@ -67,14 +62,7 @@ class CleanRunJob implements ShouldQueue
             // Reprofile the cleaned dataset so the user can compare before/after.
             ProfileRunJob::dispatch($this->run);
         } catch (Throwable $e) {
-            $step->update([
-                'result' => ['error' => $e->getMessage()],
-                'status' => 'failed',
-            ]);
-
-            $this->run->update(['status' => RunStatus::Failed]);
-
-            throw $e;
+            $this->handleStepFailure($step, $e);
         }
     }
 }

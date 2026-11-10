@@ -1,8 +1,8 @@
 <?php
 
 use App\Services\PythonServiceClient;
+use App\Services\PythonServiceException;
 use Illuminate\Http\Client\Request;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
@@ -90,10 +90,37 @@ test('extract sends only the file path', function () {
     Http::assertSent(fn (Request $request) => $request->data() === ['file_path' => 'data/test.pdf']);
 });
 
-test('client throws exception on error response', function () {
-    Http::fake([
-        '*' => Http::response(['detail' => 'Invalid file format'], 422),
-    ]);
+test('an error response throws a non-retryable exception with the service detail, without retrying', function () {
+    Http::fake(['*' => Http::response(['detail' => 'Invalid file format'], 400)]);
 
-    pythonClient()->profile('data/bad.xyz');
-})->throws(RequestException::class);
+    expect(fn () => pythonClient()->profile('data/bad.xyz'))
+        ->toThrow(fn (PythonServiceException $e) => expect($e->status)->toBe(400)
+            ->and($e->isRetryable())->toBeFalse()
+            ->and($e->getMessage())->toContain('Invalid file format'));
+
+    Http::assertSentCount(1);
+});
+
+test('gateway errors are retryable but not retried by the http client itself', function (int $status) {
+    Http::fake(['*' => Http::response('Bad gateway', $status)]);
+
+    expect(fn () => pythonClient()->profile('data/test.csv'))
+        ->toThrow(fn (PythonServiceException $e) => expect($e->isRetryable())->toBeTrue());
+
+    Http::assertSentCount(1);
+})->with([502, 503, 504]);
+
+test('an unreachable service is reported as retryable', function () {
+    Http::fake(['*' => Http::failedConnection('Connection refused')]);
+
+    expect(fn () => pythonClient()->profile('data/test.csv'))
+        ->toThrow(fn (PythonServiceException $e) => expect($e->isRetryable())->toBeTrue()
+            ->and($e->getMessage())->toContain('unreachable'));
+});
+
+test('a non-json success response is rejected', function () {
+    Http::fake(['*' => Http::response('<html>proxy page</html>', 200)]);
+
+    expect(fn () => pythonClient()->profile('data/test.csv'))
+        ->toThrow(PythonServiceException::class, 'invalid response');
+});
