@@ -2,12 +2,13 @@ import os
 import pandas as pd
 import numpy as np
 from app.config import settings
+from app.storage import resolve_storage_path
 from app.schemas.responses import ProfileResponse, ColumnStat
 from typing import Dict, Any, Optional
 
 class ProfilerService:
     def profile(self, file_path: str, options: Optional[Dict[str, Any]] = None) -> ProfileResponse:
-        full_path = os.path.join(settings.storage_path, file_path)
+        full_path = resolve_storage_path(file_path)
         
         if not os.path.exists(full_path):
             raise FileNotFoundError(f"File not found: {full_path}")

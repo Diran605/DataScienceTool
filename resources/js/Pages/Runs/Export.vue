@@ -8,11 +8,13 @@ import InputError from '@/Components/InputError.vue';
 const props = defineProps({
     run: Object,
     contracts: Array,
+    hasPassedValidation: Boolean,
 });
 
 const form = useForm({
     format: 'csv',
     schema_contract_id: '',
+    override_reason: '',
 });
 
 const submit = () => {
@@ -42,10 +44,11 @@ const submit = () => {
                                 :class="{
                                     'bg-green-100 text-green-800': run.status === 'delivered',
                                     'bg-indigo-100 text-indigo-800': run.status === 'exporting' || run.status === 'validating',
-                                    'bg-blue-100 text-blue-800': run.status === 'profiled',
-                                    'bg-gray-100 text-gray-800': !['delivered', 'exporting', 'validating', 'profiled'].includes(run.status)
+                                    'bg-blue-100 text-blue-800': ['profiled', 'cleaned', 'validated'].includes(run.status),
+                                    'bg-orange-100 text-orange-800': run.status === 'validation_failed',
+                                    'bg-gray-100 text-gray-800': !['delivered', 'exporting', 'validating', 'profiled', 'cleaned', 'validated', 'validation_failed'].includes(run.status)
                                 }">
-                                {{ run?.status }}
+                                {{ run?.status?.replace('_', ' ') }}
                             </span>
                         </div>
                     </div>
@@ -59,7 +62,7 @@ const submit = () => {
                             <select id="schema_contract_id" v-model="form.schema_contract_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                 <option value="">No Contract (Export as is)</option>
                                 <option v-for="c in contracts" :key="c.id" :value="c.id">
-                                    {{ c.dev_team_name }} - {{ c.target_table_name }} ({{ c.format }})
+                                    {{ c.dev_team_name }} ({{ c.format }})
                                 </option>
                             </select>
                             <p class="mt-1 text-xs text-gray-500">Optionally transform the output to match a specific team's schema contract.</p>
@@ -76,6 +79,22 @@ const submit = () => {
                             <InputError :message="form.errors.format" class="mt-2" />
                         </div>
                         
+                        <div v-if="!hasPassedValidation || form.errors.override_reason" class="rounded-md border border-orange-200 bg-orange-50 p-4">
+                            <InputLabel for="override_reason" value="Validation override reason" />
+                            <p class="mt-1 text-xs text-orange-700">
+                                This data has not passed validation (or was validated against a different contract).
+                                Exporting it requires a reason, which is recorded on the export step.
+                            </p>
+                            <textarea
+                                id="override_reason"
+                                v-model="form.override_reason"
+                                rows="3"
+                                maxlength="500"
+                                class="mt-2 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            ></textarea>
+                            <InputError :message="form.errors.override_reason" class="mt-2" />
+                        </div>
+
                         <div class="flex items-center gap-4 pt-4">
                             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">Export and Deliver</PrimaryButton>
                         </div>

@@ -4,31 +4,12 @@ namespace App\Jobs;
 
 use App\Enums\RunStatus;
 use App\Enums\StepType;
-use App\Models\Run;
 use App\Models\RunStep;
 use App\Services\PythonServiceClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
 
-class ProfileRunJob implements ShouldQueue
+class ProfileRunJob extends RunStepJob
 {
-    use Queueable;
-
-    /**
-     * The number of times the job may be attempted.
-     */
-    public int $tries = 2;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     */
-    public int $timeout = 300;
-
-    public function __construct(
-        public Run $run,
-    ) {}
-
     /**
      * Execute the job — call Python /profile and store the quality report.
      */
@@ -36,14 +17,16 @@ class ProfileRunJob implements ShouldQueue
     {
         $this->run->update(['status' => RunStatus::Profiling]);
 
+        $filePathToProfile = $this->run->workingFilePath();
+
         $step = RunStep::create([
             'run_id' => $this->run->id,
             'step_type' => StepType::Profile,
+            'input_file_path' => $filePathToProfile,
             'status' => 'running',
         ]);
 
         try {
-            $filePathToProfile = $this->run->cleaned_file_path ?? $this->run->source_file_path;
             $report = $pythonService->profile($filePathToProfile);
 
             $step->update([
@@ -51,16 +34,11 @@ class ProfileRunJob implements ShouldQueue
                 'status' => 'completed',
             ]);
 
-            $this->run->update(['status' => RunStatus::Profiled]);
-        } catch (Throwable $e) {
-            $step->update([
-                'result' => ['error' => $e->getMessage()],
-                'status' => 'failed',
+            $this->run->update([
+                'status' => $this->run->current_file_path ? RunStatus::Cleaned : RunStatus::Profiled,
             ]);
-
-            $this->run->update(['status' => RunStatus::Failed]);
-
-            throw $e;
+        } catch (Throwable $e) {
+            $this->handleStepFailure($step, $e);
         }
     }
 }

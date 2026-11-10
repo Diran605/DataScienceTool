@@ -24,7 +24,7 @@ services:
       - QUEUE_CONNECTION=redis
       - REDIS_HOST=redis
       - PYTHON_SERVICE_URL=http://python:8000
-      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+      - INTERNAL_KEY=${INTERNAL_KEY:?Set INTERNAL_KEY in .env to a long random value}
     networks:
       - datasciencetool
 
@@ -52,7 +52,7 @@ services:
       - QUEUE_CONNECTION=redis
       - REDIS_HOST=redis
       - PYTHON_SERVICE_URL=http://python:8000
-      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+      - INTERNAL_KEY=${INTERNAL_KEY:?Set INTERNAL_KEY in .env to a long random value}
     networks:
       - datasciencetool
 
@@ -62,11 +62,11 @@ services:
       context: ./python-service
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000" # localhost only: the service must not be reachable from the network
     volumes:
       - storage-data:/shared-storage
     environment:
-      - INTERNAL_KEY=${INTERNAL_KEY:-local-dev-secret-key}
+      - INTERNAL_KEY=${INTERNAL_KEY:?Set INTERNAL_KEY in .env to a long random value}
       - STORAGE_PATH=/shared-storage
     networks:
       - datasciencetool
@@ -75,7 +75,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     environment:
       - MYSQL_DATABASE=datasciencetool
       - MYSQL_USER=sail
@@ -90,7 +90,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
     networks:

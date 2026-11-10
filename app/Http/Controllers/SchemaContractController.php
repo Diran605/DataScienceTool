@@ -15,11 +15,11 @@ class SchemaContractController extends Controller
     /**
      * Display a listing of schema contracts.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', SchemaContract::class);
 
-        $user = auth()->user();
+        $user = $request->user();
 
         $contracts = SchemaContract::query()
             ->when(! $user->hasRole('superadmin'), function ($query) use ($user) {

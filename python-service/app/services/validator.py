@@ -1,12 +1,13 @@
 import os
 import pandas as pd
 from app.config import settings
+from app.storage import resolve_storage_path
 from app.schemas.responses import ValidateResponse
 from typing import Dict, Any
 
 class ValidatorService:
     def validate(self, file_path: str, schema_definition: Dict[str, Any]) -> ValidateResponse:
-        full_path = os.path.join(settings.storage_path, file_path)
+        full_path = resolve_storage_path(file_path)
         
         if not os.path.exists(full_path):
             raise FileNotFoundError(f"File not found: {full_path}")
@@ -28,7 +29,8 @@ class ValidatorService:
         # 1. Check missing columns
         for expected_col in expected_columns:
             name = expected_col.get('name')
-            if name not in df_cols:
+            # Optional columns ("required": false) may be absent.
+            if name not in df_cols and expected_col.get('required', True):
                 errors.append({
                     "rule": "missing_column",
                     "column": name,

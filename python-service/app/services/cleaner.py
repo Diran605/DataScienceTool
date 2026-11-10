@@ -2,12 +2,15 @@ import os
 import pandas as pd
 import uuid
 from app.config import settings
+from app.storage import resolve_storage_path
+from app.errors import UnsafeExpressionError
+from app.services.expressions import apply_filter_expression
 from app.schemas.responses import CleanResponse
 from typing import List, Dict, Any, Optional
 
 class CleanerService:
     def clean(self, file_path: str, steps: List[Dict[str, Any]], options: Optional[Dict[str, Any]] = None) -> CleanResponse:
-        full_path = os.path.join(settings.storage_path, file_path)
+        full_path = resolve_storage_path(file_path)
         
         if not os.path.exists(full_path):
             raise FileNotFoundError(f"File not found: {full_path}")
@@ -111,12 +114,14 @@ class CleanerService:
             elif action == 'custom_expression':
                 expression = step.get('value')
                 if expression:
-                    # Very basic sandbox using df.query
-                    # For more complex assignments, eval could be used, but query is safer for filtering
+                    # Row filter. The expression is checked against a strict
+                    # allow-list first; unsafe input raises UnsafeExpressionError (HTTP 400).
                     try:
-                        df = df.query(expression)
+                        df = apply_filter_expression(df, expression)
+                    except UnsafeExpressionError:
+                        raise
                     except Exception as e:
-                        raise ValueError(f"Failed to evaluate custom expression: {str(e)}")
+                        raise UnsafeExpressionError(f"Failed to evaluate filter expression: {e}") from None
             
         final_rows = len(df)
         rows_modified = initial_rows - final_rows
@@ -145,7 +150,7 @@ class CleanerService:
         new_filename = f"cleaned_{uuid.uuid4().hex[:8]}.csv"
         # Always output as CSV after cleaning for downstream compatibility
         cleaned_rel_path = os.path.join(file_dir, new_filename).replace('\\', '/')
-        cleaned_full_path = os.path.join(settings.storage_path, cleaned_rel_path)
+        cleaned_full_path = resolve_storage_path(cleaned_rel_path)
         
         df.to_csv(cleaned_full_path, index=False)
         

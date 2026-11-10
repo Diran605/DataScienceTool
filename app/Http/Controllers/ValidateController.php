@@ -17,27 +17,17 @@ class ValidateController extends Controller
     /**
      * Show the validation form — pick a contract and validate.
      */
-    public function create(Run $run): Response
+    public function create(Request $request, Run $run): Response
     {
-        Gate::authorize('view', $run);
+        Gate::authorize('process', $run);
 
-        abort_unless(
-            in_array($run->status->value, ['profiled', 'cleaned', 'validating', 'exporting', 'delivered']),
-            422,
-            'Run must be profiled or cleaned before validation.'
-        );
-
-        $user = auth()->user();
-
-        $contracts = SchemaContract::query()
-            ->when(! $user->hasRole('superadmin'), function ($query) use ($user) {
-                $query->whereHas('users', fn ($q) => $q->where('user_id', $user->id));
-            })
-            ->get(['id', 'dev_team_name', 'format']);
+        abort_unless($run->status->canValidate(), 422, 'Run must be profiled or cleaned before validation.');
 
         return Inertia::render('Runs/Validate', [
             'run' => $run->load('steps'),
-            'contracts' => $contracts,
+            'contracts' => SchemaContract::query()
+                ->runnableBy($request->user())
+                ->get(['id', 'dev_team_name', 'format']),
         ]);
     }
 
@@ -46,22 +36,21 @@ class ValidateController extends Controller
      */
     public function store(Request $request, Run $run): RedirectResponse
     {
-        Gate::authorize('view', $run);
+        Gate::authorize('process', $run);
 
-        abort_unless(
-            in_array($run->status->value, ['profiled', 'cleaned', 'validating', 'exporting', 'delivered']),
-            422,
-            'Run must be profiled or cleaned before validation.'
-        );
+        abort_unless($run->status->canValidate(), 422, 'Run must be profiled or cleaned before validation.');
 
         $validated = $request->validate([
             'schema_contract_id' => ['required', 'exists:schema_contracts,id'],
-            'override_reason' => ['nullable', 'string', 'max:500'],
         ]);
 
         $contract = SchemaContract::findOrFail($validated['schema_contract_id']);
 
-        ValidateRunJob::dispatch($run, $contract, $validated['override_reason'] ?? null);
+        Gate::authorize('run', $contract);
+
+        abort_unless($run->claim(RunStatus::settled(), RunStatus::Validating), 409, 'This run is already being processed.');
+
+        ValidateRunJob::dispatch($run, $contract);
 
         return redirect()->route('runs.show', $run)
             ->with('success', 'Validation has started.');

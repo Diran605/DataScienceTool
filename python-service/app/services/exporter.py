@@ -3,12 +3,13 @@ import json
 import pandas as pd
 import uuid
 from app.config import settings
+from app.storage import resolve_storage_path
 from app.schemas.responses import ExportResponse
 from typing import Optional, Dict, Any
 
 class ExporterService:
     def export(self, file_path: str, target_format: str, schema_definition: Optional[Dict[str, Any]] = None) -> ExportResponse:
-        full_path = os.path.join(settings.storage_path, file_path)
+        full_path = resolve_storage_path(file_path)
         
         if not os.path.exists(full_path):
             raise FileNotFoundError(f"File not found: {full_path}")
@@ -26,7 +27,7 @@ class ExporterService:
         base_filename = f"exported_{uuid.uuid4().hex[:8]}"
         new_filename = f"{base_filename}.{target_format}"
         exported_rel_path = os.path.join(file_dir, new_filename).replace('\\', '/')
-        exported_full_path = os.path.join(settings.storage_path, exported_rel_path)
+        exported_full_path = resolve_storage_path(exported_rel_path)
         
         # Optionally filter to only the contract columns if schema_definition is provided
         if schema_definition and 'columns' in schema_definition:
@@ -48,7 +49,7 @@ class ExporterService:
         # Generate Data Dictionary
         dict_filename = f"{base_filename}_dictionary.json"
         dict_rel_path = os.path.join(file_dir, dict_filename).replace('\\', '/')
-        dict_full_path = os.path.join(settings.storage_path, dict_rel_path)
+        dict_full_path = resolve_storage_path(dict_rel_path)
         
         data_dict = {
             "dataset_info": {

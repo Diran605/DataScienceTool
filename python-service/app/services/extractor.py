@@ -3,11 +3,12 @@ import uuid
 import pandas as pd
 import pdfplumber
 from app.config import settings
+from app.storage import resolve_storage_path
 from app.schemas.responses import ExtractResponse
 
 class ExtractorService:
     def extract(self, file_path: str) -> ExtractResponse:
-        full_path = os.path.join(settings.storage_path, file_path)
+        full_path = resolve_storage_path(file_path)
         
         if not os.path.exists(full_path):
             raise FileNotFoundError(f"File not found: {full_path}")
@@ -61,7 +62,7 @@ class ExtractorService:
         file_dir = os.path.dirname(file_path)
         new_filename = f"extracted_{uuid.uuid4().hex[:8]}.csv"
         extracted_rel_path = os.path.join(file_dir, new_filename).replace('\\', '/')
-        extracted_full_path = os.path.join(settings.storage_path, extracted_rel_path)
+        extracted_full_path = resolve_storage_path(extracted_rel_path)
         
         df.to_csv(extracted_full_path, index=False)
         

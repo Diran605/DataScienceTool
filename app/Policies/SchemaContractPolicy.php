@@ -39,6 +39,17 @@ class SchemaContractPolicy
     }
 
     /**
+     * Determine whether the user can validate or export runs against the contract.
+     */
+    public function run(User $user, SchemaContract $schemaContract): bool
+    {
+        return $user->scopedContracts()
+            ->where('schema_contract_id', $schemaContract->id)
+            ->wherePivot('can_run', true)
+            ->exists();
+    }
+
+    /**
      * Determine whether the user can create contracts.
      */
     public function create(User $user): bool

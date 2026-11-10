@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Delivery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -14,9 +15,9 @@ class DeliveryController extends Controller
     /**
      * Display a listing of deliveries.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $deliveries = Delivery::query()
             ->when(! $user->hasRole('superadmin'), function ($query) use ($user) {

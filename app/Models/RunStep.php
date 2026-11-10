@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['run_id', 'step_type', 'config', 'result', 'status'])]
+#[Fillable(['run_id', 'step_type', 'input_file_path', 'output_file_path', 'config', 'result', 'status'])]
 class RunStep extends Model
 {
     /** @use HasFactory<RunStepFactory> */

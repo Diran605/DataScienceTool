@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Run;
 use App\Models\RunStep;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,7 +15,7 @@ class RunStepController extends Controller
      */
     public function show(Run $run, RunStep $step): Response
     {
-        \Illuminate\Support\Facades\Gate::authorize('view', $run);
+        Gate::authorize('view', $run);
 
         abort_unless($step->run_id === $run->id, 404);
 

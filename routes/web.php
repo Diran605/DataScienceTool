@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\CleanController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ProfileController;
@@ -9,15 +10,13 @@ use App\Http\Controllers\RunController;
 use App\Http\Controllers\RunStepController;
 use App\Http\Controllers\SchemaContractController;
 use App\Http\Controllers\ValidateController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect()->to(auth()->check() ? '/runs' : '/login');
 });
 
-Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
