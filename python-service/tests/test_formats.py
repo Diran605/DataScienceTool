@@ -61,7 +61,7 @@ def test_validate_reads_parquet():
 
 @pytest.mark.parametrize("target_format, reader", [
     ("csv", pd.read_csv),
-    ("json", pd.read_json),
+    ("json", lambda path: pd.read_json(path, lines=True)),  # exported as JSON Lines
     ("parquet", pd.read_parquet),
 ])
 def test_export_writes_each_offered_format(target_format, reader):
