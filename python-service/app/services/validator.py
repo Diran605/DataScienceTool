@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from app.config import settings
 from app.storage import resolve_storage_path
+from app.dataframes import read_dataframe
 from app.schemas.responses import ValidateResponse
 from typing import Dict, Any
 
@@ -9,17 +10,7 @@ class ValidatorService:
     def validate(self, file_path: str, schema_definition: Dict[str, Any]) -> ValidateResponse:
         full_path = resolve_storage_path(file_path)
         
-        if not os.path.exists(full_path):
-            raise FileNotFoundError(f"File not found: {full_path}")
-            
-        if full_path.endswith('.csv'):
-            df = pd.read_csv(full_path)
-        elif full_path.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(full_path)
-        elif full_path.endswith('.parquet'):
-            df = pd.read_parquet(full_path)
-        else:
-            raise ValueError(f"Unsupported file format for validation.")
+        df = read_dataframe(full_path)
             
         errors = []
         expected_columns = schema_definition.get('columns', [])

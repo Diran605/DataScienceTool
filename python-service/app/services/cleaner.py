@@ -3,6 +3,7 @@ import pandas as pd
 import uuid
 from app.config import settings
 from app.storage import resolve_storage_path
+from app.dataframes import read_dataframe
 from app.errors import UnsafeExpressionError
 from app.services.expressions import apply_filter_expression
 from app.schemas.responses import CleanResponse
@@ -12,17 +13,7 @@ class CleanerService:
     def clean(self, file_path: str, steps: List[Dict[str, Any]], options: Optional[Dict[str, Any]] = None) -> CleanResponse:
         full_path = resolve_storage_path(file_path)
         
-        if not os.path.exists(full_path):
-            raise FileNotFoundError(f"File not found: {full_path}")
-            
-        if full_path.endswith('.csv'):
-            df = pd.read_csv(full_path)
-        elif full_path.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(full_path)
-        elif full_path.endswith('.parquet'):
-            df = pd.read_parquet(full_path)
-        else:
-            raise ValueError(f"Unsupported file format for cleaning.")
+        df = read_dataframe(full_path)
             
         # Preview Mode
         is_preview = options and options.get('preview_only', False)

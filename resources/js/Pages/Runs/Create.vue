@@ -72,14 +72,14 @@ const submit = () => {
                                                     ref="fileInput"
                                                     type="file"
                                                     class="sr-only"
-                                                    accept=".csv,.xlsx,.xls,.json,.pdf,.txt,.doc,.docx"
+                                                    accept=".csv,.xlsx,.xls,.parquet,.json,.pdf,.txt,.doc,.docx"
                                                     @change="handleFileSelect"
                                                 />
                                             </label>
                                             <p class="pl-1">or drag and drop</p>
                                         </div>
                                         <p class="text-xs leading-5 text-gray-600">
-                                            CSV, Excel, JSON, PDF, TXT, DOC up to 100MB
+                                            CSV, Excel, Parquet, JSON, PDF, TXT, DOC up to 100MB
                                         </p>
                                     </div>
                                 </div>

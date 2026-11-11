@@ -29,7 +29,7 @@ class StoreRunRequest extends FormRequest
                 'required',
                 'file',
                 'max:102400', // 100MB
-                'extensions:csv,xlsx,xls,json,pdf,txt,doc,docx',
+                'extensions:csv,xlsx,xls,parquet,json,pdf,txt,doc,docx',
             ],
         ];
     }
@@ -41,7 +41,7 @@ class StoreRunRequest extends FormRequest
     {
         return [
             'file.max' => 'The file must not exceed 100MB.',
-            'file.extensions' => 'Supported file extensions: CSV, Excel, JSON, PDF, TXT, DOC, DOCX.',
+            'file.extensions' => 'Supported file extensions: CSV, Excel, Parquet, JSON, PDF, TXT, DOC, DOCX.',
         ];
     }
 

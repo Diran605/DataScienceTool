@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from app.config import settings
 from app.storage import resolve_storage_path
+from app.dataframes import read_dataframe
 from app.schemas.responses import ProfileResponse, ColumnStat
 from typing import Dict, Any, Optional
 
@@ -10,17 +11,7 @@ class ProfilerService:
     def profile(self, file_path: str, options: Optional[Dict[str, Any]] = None) -> ProfileResponse:
         full_path = resolve_storage_path(file_path)
         
-        if not os.path.exists(full_path):
-            raise FileNotFoundError(f"File not found: {full_path}")
-            
-        if full_path.endswith('.csv'):
-            df = pd.read_csv(full_path)
-        elif full_path.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(full_path)
-        elif full_path.endswith('.parquet'):
-            df = pd.read_parquet(full_path)
-        else:
-            raise ValueError(f"Unsupported file format for {file_path}")
+        df = read_dataframe(full_path)
             
         # Sampling Mode for large files
         if options and options.get('sample_size'):

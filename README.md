@@ -204,8 +204,7 @@ project-spec.md   The full specification and build plan
 
 ## Known limitations
 
-- **Supported formats for processing:** CSV works end to end. Excel and Parquet need
-  `openpyxl` and `pyarrow`, which are not yet in `python-service/requirements.txt`.
+- **Supported formats for processing:** CSV, Excel (`.xlsx`, `.xls`) and Parquet.
   Uploads also accept JSON, TXT, DOC and DOCX, but they can't be profiled yet.
 - **PDF extraction** exists in the Python service (`/extract`), but nothing in the
   web app calls it yet.
